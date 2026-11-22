@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Своя Игра 6+</string>
+    <string name="exit_toast">Нажми ещё раз, чтобы выйти</string>
+</resources>

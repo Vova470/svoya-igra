@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0a30">
+<meta name="description" content="Своя игра — детский выпуск 6+. 8 категорий, 40 вопросов, два игрока.">
+<title>Своя игра · Детский выпуск 6+</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#070620; --surface:#1b1650; --surface2:#241d66;
+  --line:rgba(150,140,255,.22);
+  --gold:#ffc233; --gold2:#ff9d00; --goldL:#ffd76a;
+  --text:#f4f1ff; --muted:#a9a3d9;
+  --green:#3ddc84; --red:#ff5c6c; --blue:#3fa9ff; --magenta:#ff4fa3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-color:var(--gold) #0d0a30;scrollbar-width:thin;overscroll-behavior:none}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0d0a30}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold),var(--gold2));border-radius:99px;border:2px solid #0d0a30}
+::-webkit-scrollbar-thumb:hover{background:var(--goldL)}
+body{
+  font-family:'Nunito',system-ui,sans-serif;color:var(--text);
+  background:var(--bg0);min-height:100vh;min-height:100dvh;overflow-x:hidden;
+  overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+}
+input{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.stage{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(1200px 800px at 50% -10%, #2b1a70 0%, transparent 60%),
+  radial-gradient(900px 620px at 88% 112%, #3b1060 0%, transparent 55%),
+  radial-gradient(760px 540px at 6% 108%, #0e2a6e 0%, transparent 55%),
+  var(--bg0);}
+#bg{position:fixed;inset:0;z-index:1;pointer-events:none}
+.beams{position:fixed;inset:0;z-index:2;overflow:hidden;pointer-events:none}
+.beams i{position:absolute;top:-12%;width:36vw;height:135vh;filter:blur(34px);transform-origin:top center}
+.beams .b1{left:6%;background:linear-gradient(to bottom,rgba(139,92,246,.30),transparent 72%);animation:sway1 16s ease-in-out infinite alternate}
+.beams .b2{right:6%;background:linear-gradient(to bottom,rgba(255,194,51,.17),transparent 72%);animation:sway2 19s ease-in-out infinite alternate}
+@keyframes sway1{from{transform:rotate(-15deg)}to{transform:rotate(-3deg)}}
+@keyframes sway2{from{transform:rotate(15deg)}to{transform:rotate(3deg)}}
+.grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");}
+#fx{position:fixed;inset:0;z-index:80;pointer-events:none}
+#app{position:relative;z-index:10}
+.hud{position:sticky;top:0;z-index:30;display:flex;flex-direction:column;gap:10px;
+  padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));
+  background:rgba(9,7,34,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top{max-width:1180px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{display:flex;align-items:center;gap:9px;min-width:0}
+.logo-star{font-size:26px;filter:drop-shadow(0 0 10px rgba(255,194,51,.8));animation:starSpin 7s ease-in-out infinite}
+@keyframes starSpin{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(10deg) scale(1.12)}}
+.logo h1{font-family:'Russo One';font-size:22px;letter-spacing:1px;line-height:1;
+  background:linear-gradient(120deg,var(--goldL),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 14px rgba(255,194,51,.35))}
+.logo-sub{display:block;font-size:9.5px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.top-actions{display:flex;gap:8px;flex-shrink:0}
+.icon-btn{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:99px;border:1px solid var(--line);
+  background:var(--surface);font-weight:800;font-size:13px;transition:.2s}
+.icon-btn:hover{border-color:var(--gold);transform:translateY(-1px)}
+.icon-btn.off{color:var(--muted);border-style:dashed}
+.btn-newgame{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;font-family:'Russo One';font-size:12.5px;
+  color:var(--gold);border:1.5px solid var(--gold);background:rgba(255,194,51,.08);box-shadow:0 0 16px rgba(255,194,51,.15);transition:.2s}
+.btn-newgame:hover{background:rgba(255,194,51,.18);box-shadow:0 0 24px rgba(255,194,51,.35);transform:translateY(-1px)}
+.players{max-width:1180px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.player{position:relative;display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:16px;
+  background:linear-gradient(150deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),var(--surface);
+  border:2px solid var(--line);transition:border-color .3s,box-shadow .3s}
+.player.active{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc),0 0 26px var(--pcGlow)}
+.player.bump{animation:bump .6s}
+@keyframes bump{30%{transform:scale(1.035)}}
+.avatar{width:52px;height:52px;flex-shrink:0;border-radius:50%;background:var(--pcFaint);border:2px solid var(--pc);
+  font-size:28px;display:grid;place-items:center;transition:transform .2s}
+.avatar:hover{transform:scale(1.1) rotate(-8deg)}
+.pinfo{min-width:0;flex:1}
+.name-btn{display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px;max-width:100%;padding:1px 0}
+.name-btn .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;border-bottom:1px dotted rgba(255,255,255,.3)}
+.name-btn .pen{font-size:11px;opacity:.55}
+.name-btn:hover .pen{opacity:1;color:var(--gold)}
+.name-input{width:100%;max-width:150px;font:inherit;font-weight:800;font-size:16px;color:var(--text);
+  background:var(--surface2);border:1.5px solid var(--pc);border-radius:8px;padding:3px 8px}
+.score-row{display:flex;align-items:baseline;gap:6px;margin-top:2px}
+.score{font-family:'Russo One';font-size:30px;line-height:1;color:var(--gold);text-shadow:0 0 18px rgba(255,194,51,.45)}
+.score-label{font-size:9.5px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.badge{position:absolute;top:-9px;right:10px;font-size:9.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;
+  background:var(--pc);color:#0a0820;padding:3px 9px;border-radius:99px;opacity:0;transform:scale(.6);transition:.25s;box-shadow:0 0 14px var(--pcGlow)}
+.player.active .badge{opacity:1;transform:none;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 22px var(--pcGlow),0 0 4px var(--pc)}}
+.float{position:absolute;right:14px;top:6px;font-family:'Russo One';font-size:21px;color:var(--green);
+  text-shadow:0 0 14px rgba(61,220,132,.7);animation:floatUp 1.25s forwards;pointer-events:none}
+@keyframes floatUp{0%{opacity:0;transform:translateY(10px) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translateY(-36px) scale(1.18)}}
+.statusline{max-width:1180px;width:100%;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.turn-banner{flex:1 1 240px;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:99px;
+  font-weight:800;font-size:13.5px;border:1px solid var(--line);min-height:38px;transition:.3s}
+.meta{display:flex;align-items:center;gap:12px;margin-left:auto}
+.pack-pill{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;white-space:nowrap}
+.progress{display:flex;align-items:center;gap:7px}
+.progress span{font-size:11px;font-weight:900;color:var(--gold);white-space:nowrap}
+.bar{width:110px;height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .5s;box-shadow:0 0 8px rgba(255,194,51,.6)}
+main{max-width:1180px;margin:0 auto;
+  padding:16px calc(14px + env(safe-area-inset-right)) calc(44px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+.board{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+.cat{display:flex;flex-direction:column;gap:10px;min-width:0}
+.cat-head{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;
+  min-height:96px;padding:10px 6px;border-radius:14px;border:1px solid var(--catSoft);
+  background:linear-gradient(160deg,var(--catFaint),rgba(255,255,255,.02))}
+.cat-ico{font-size:26px;filter:drop-shadow(0 0 10px var(--catGlow))}
+.cat-name{font-family:'Russo One';font-size:12px;letter-spacing:.4px;text-transform:uppercase;line-height:1.25;color:#f2efff;text-shadow:0 0 12px var(--catGlow)}
+.cat-count{font-size:10px;font-weight:900;color:var(--cat)}
+.cells{display:flex;flex-direction:column;gap:10px;flex:1}
+.cell{position:relative;height:72px;border-radius:14px;display:grid;place-items:center;overflow:hidden;
+  background:linear-gradient(165deg,#251d68,#171243);border:1px solid var(--catSoft);
+  transition:transform .18s,box-shadow .18s,border-color .18s}
+.cell::before{content:'';position:absolute;inset:0;background:radial-gradient(130px 65px at 50% 125%,var(--catFaint),transparent 72%)}
+.cell-val{position:relative;font-family:'Russo One';font-size:26px;color:var(--gold);
+  text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 16px rgba(255,194,51,.35);transition:.2s}
+.cell:hover:not(.done){transform:translateY(-3px);border-color:var(--cat);box-shadow:0 8px 22px rgba(0,0,0,.4),0 0 18px var(--catGlow)}
+.cell:active:not(.done){transform:scale(.95)}
+.cell-check{display:none;font-size:30px;font-weight:900;color:var(--cat);text-shadow:0 0 14px var(--catGlow)}
+.cell.done{cursor:default;background:#100d33;border-color:rgba(255,255,255,.06)}
+.cell.done::before{opacity:.25}
+.cell.done .cell-val{position:absolute;bottom:7px;font-size:11px;color:var(--muted);text-shadow:none;opacity:.75}
+.cell.done .cell-check{display:block;animation:checkPop .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes checkPop{from{transform:scale(.2);opacity:0}60%{transform:scale(1.3)}to{transform:scale(1);opacity:1}}
+footer{margin-top:22px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--muted);max-width:640px;margin-left:auto;margin-right:auto}
+footer b{color:var(--gold)}
+.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:14px}
+.overlay[hidden]{display:none!important}
+#confirmModal{z-index:60}
+#winModal{z-index:55}
+.scrim{position:absolute;inset:0;background:rgba(6,5,26,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.card{position:relative;width:min(640px,100%);max-height:calc(100vh - 28px);max-height:calc(100dvh - 28px);overflow-y:auto;
+  border-radius:22px;padding:22px 20px;background:linear-gradient(165deg,#241c66,#120e3e);
+  border:1px solid var(--catSoft,var(--line));box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 70px var(--catFaint,rgba(139,92,246,.12));
+  animation:pop .38s cubic-bezier(.2,1.4,.4,1)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--cat,var(--gold)),var(--gold))}
+@keyframes pop{from{transform:scale(.86) translateY(20px);opacity:0}}
+.qclose{position:absolute;top:13px;right:13px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);color:var(--muted);font-size:15px;transition:.2s;z-index:2}
+.qclose:hover{background:rgba(255,255,255,.16);color:#fff}
+.qtop{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-right:38px;margin-bottom:8px}
+.qcat{font-weight:900;font-size:12.5px;padding:6px 12px;border-radius:99px;background:var(--catFaint);border:1px solid var(--catSoft);color:#fff}
+.qval{font-family:'Russo One';font-size:21px;color:#241a00;background:linear-gradient(135deg,var(--goldL),var(--gold2));
+  padding:4px 14px;border-radius:12px;box-shadow:0 0 20px rgba(255,194,51,.4)}
+.qturn{font-size:13px;color:var(--muted);margin-bottom:8px}
+.qtext{font-size:clamp(20px,4.6vw,29px);font-weight:800;line-height:1.35;text-align:center;margin:10px 0 6px;text-wrap:balance}
+.qhint{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px}
+.btn-reveal{width:100%;padding:15px;border-radius:14px;font-family:'Russo One';font-size:17px;color:#241a00;
+  background:linear-gradient(135deg,var(--goldL),var(--gold2));box-shadow:0 6px 24px rgba(255,157,0,.35);transition:.2s;animation:breathe 2.2s infinite}
+.btn-reveal:hover{filter:brightness(1.07)}
+.btn-reveal:active{transform:scale(.97)}
+@keyframes breathe{50%{box-shadow:0 6px 36px rgba(255,157,0,.6);transform:scale(1.013)}}
+.answer{border:1px solid rgba(61,220,132,.5);background:rgba(61,220,132,.1);border-radius:14px;padding:14px;text-align:center;animation:slideDown .35s}
+.answer-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);font-weight:900}
+.answer p{font-size:clamp(19px,4vw,25px);font-weight:900;margin-top:4px;line-height:1.3}
+@keyframes slideDown{from{opacity:0;transform:translateY(-12px)}}
+.fact{font-size:13.5px;color:var(--muted);text-align:center;margin:10px 2px 14px;line-height:1.5;animation:slideDown .45s}
+.verdicts{display:grid;grid-template-columns:1fr 1fr;gap:10px;animation:slideDown .5s}
+.btn-ok,.btn-no{padding:14px 8px;border-radius:14px;font-family:'Russo One';font-size:15px;min-height:58px;transition:transform .15s,filter .15s}
+.btn-ok{background:linear-gradient(135deg,#4be49a,#0ea56f);color:#03210f;box-shadow:0 6px 20px rgba(61,220,132,.3)}
+.btn-no{background:linear-gradient(135deg,#ff7285,#e11d48);color:#fff;box-shadow:0 6px 20px rgba(255,92,108,.3)}
+.btn-ok:hover,.btn-no:hover{filter:brightness(1.09);transform:translateY(-2px)}
+.btn-ok:active,.btn-no:active{transform:scale(.96)}
+.btn-ok:disabled,.btn-no:disabled,.qclose:disabled{opacity:.55;pointer-events:none}
+.card.good{animation:goodFlash .95s}
+@keyframes goodFlash{25%{box-shadow:0 0 0 3px var(--green),0 0 90px rgba(61,220,132,.55)}}
+.card.bad{animation:badShake .55s}
+@keyframes badShake{15%{transform:translateX(-9px)}30%{transform:translateX(8px)}45%{transform:translateX(-6px)}60%{transform:translateX(5px)}75%{transform:translateX(-2px)}
+  20%{box-shadow:0 0 0 3px var(--red),0 0 70px rgba(255,92,108,.4)}}
+.card.small{width:min(430px,100%);text-align:center;--cat:var(--gold);--catSoft:rgba(255,194,51,.4);--catFaint:rgba(255,194,51,.1)}
+.card.small h2{font-family:'Russo One';font-size:23px;color:var(--gold);margin:6px 0 8px;text-shadow:0 0 20px rgba(255,194,51,.4)}
+.card.small .sub{font-size:14.5px;line-height:1.55;color:var(--text);margin-bottom:18px}
+.btn-gold{width:100%;padding:14px;border-radius:14px;font-family:'Russo One';font-size:15px;color:#241a00;
+  background:linear-gradient(135deg,var(--goldL),var(--gold2));box-shadow:0 6px 24px rgba(255,157,0,.35);transition:.2s}
+.btn-gold:hover{filter:brightness(1.07);transform:translateY(-2px)}
+.btn-ghost{width:100%;padding:12px;border-radius:14px;font-weight:800;font-size:14px;color:var(--muted);border:1.5px solid var(--line);transition:.2s;margin-top:10px}
+.btn-ghost:hover{color:#fff;border-color:var(--muted)}
+.trophy{font-size:64px;line-height:1;animation:bounce 1.3s ease-in-out infinite;filter:drop-shadow(0 0 24px rgba(255,194,51,.6))}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-12px) rotate(4deg)}}
+.win-scores{display:flex;gap:10px;justify-content:center;margin:16px 0 18px}
+.chip{flex:1;max-width:210px;padding:10px 8px;border-radius:14px;border:2px solid var(--pc);background:var(--pcFaint)}
+.chip .cn{font-weight:800;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip .cs{font-family:'Russo One';font-size:25px;color:var(--gold);margin-top:2px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:var(--surface2);border:1px solid var(--gold);color:var(--text);padding:10px 18px;border-radius:99px;
+  font-weight:800;font-size:13.5px;opacity:0;transition:.3s;z-index:95;pointer-events:none;max-width:92vw;text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 20px rgba(255,194,51,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (max-width:900px){
+  .hud{padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) 10px calc(10px + env(safe-area-inset-left));gap:8px}
+  .logo h1{font-size:17px}
+  .logo-star{font-size:21px}
+  .logo-sub{font-size:8px;letter-spacing:1.4px}
+  .icon-btn{padding:7px 10px;font-size:12px}
+  .btn-newgame{padding:7px 11px;font-size:11px}
+  .players{gap:8px}
+  .player{padding:8px 9px;gap:8px;border-radius:14px}
+  .avatar{width:42px;height:42px;font-size:23px}
+  .name-btn{font-size:13.5px}
+  .name-btn .nm{max-width:86px}
+  .score{font-size:23px}
+  .badge{font-size:8.5px;top:-8px;right:7px}
+  .turn-banner{font-size:12.5px;padding:7px 12px;flex:1 1 100%}
+  .meta{margin-left:0;width:100%;justify-content:space-between}
+  main{padding:12px calc(10px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left))}
+  .board{display:flex;flex-direction:column;gap:13px}
+  .cat{gap:7px}
+  .cat-head{flex-direction:row;justify-content:flex-start;text-align:left;min-height:0;padding:8px 12px;gap:9px}
+  .cat-ico{font-size:21px}
+  .cat-name{font-size:12.5px;flex:1}
+  .cat-count{font-size:11px}
+  .cells{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+  .cell{height:56px;border-radius:12px}
+  .cell-val{font-size:18px}
+  .cell-check{font-size:23px}
+  .cell.done .cell-val{bottom:4px;font-size:9px}
+  .card{padding:18px 15px}
+  .qval{font-size:18px}
+  footer{font-size:11.5px}
+}
+@media (max-width:380px){
+  .icon-btn .lbl{display:none}
+  .cell-val{font-size:16px}
+  .btn-ok,.btn-no{font-size:13px}
+  .name-btn .nm{max-width:70px}
+}
+@media (prefers-reduced-motion:reduce){
+  .beams i,.logo-star,.btn-reveal,.trophy,.player.active .badge{animation:none}
+  *{transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="stage"></div>
+<canvas id="bg"></canvas>
+<div class="beams"><i class="b1"></i><i class="b2"></i></div>
+<div class="grain"></div>
+
+<div id="app">
+  <div class="hud">
+    <div class="top">
+      <div class="logo">
+        <span class="logo-star">⭐</span>
+        <div><h1>СВОЯ ИГРА</h1><span class="logo-sub">детский выпуск · 6+</span></div>
+      </div>
+      <div class="top-actions">
+        <button id="soundBtn" class="icon-btn" aria-pressed="true" title="Включить или выключить звук">🔊 <span class="lbl">Звук</span></button>
+        <button id="newBtn" class="btn-newgame">✨ Новая игра</button>
+      </div>
+    </div>
+    <div class="players">
+      <article class="player" id="p0">
+        <button class="avatar" data-av="0" aria-label="Сменить аватар игрока 1" title="Нажми, чтобы сменить зверька">🦁</button>
+        <div class="pinfo">
+          <button class="name-btn" data-name="0" title="Нажми, чтобы изменить имя"><span class="nm">Игрок 1</span><span class="pen">✎</span></button>
+          <div class="score-row"><span class="score" id="score0">0</span><span class="score-label">очков</span></div>
+        </div>
+        <span class="badge">ходит ⚡</span>
+      </article>
+      <article class="player" id="p1">
+        <button class="avatar" data-av="1" aria-label="Сменить аватар игрока 2" title="Нажми, чтобы сменить зверька">🦊</button>
+        <div class="pinfo">
+          <button class="name-btn" data-name="1" title="Нажми, чтобы изменить имя"><span class="nm">Игрок 2</span><span class="pen">✎</span></button>
+          <div class="score-row"><span class="score" id="score1">0</span><span class="score-label">очков</span></div>
+        </div>
+        <span class="badge">ходит ⚡</span>
+      </article>
+    </div>
+    <div class="statusline">
+      <div class="turn-banner" id="turnBanner"></div>
+      <div class="meta">
+        <span class="pack-pill" id="packPill"></span>
+        <div class="progress"><span id="progText">0 / 40</span><div class="bar"><i id="progFill"></i></div></div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="board" id="board" aria-label="Игровое поле"></section>
+    <footer>
+      Правила простые: выбери вопрос → ответь вслух → открой ответ. <b>Верно</b> — забираешь очки!
+      Ошибся — не страшно, очки не снимаем, а ход переходит другу. После каждого вопроса ход меняется автоматически. 🧡
+    </footer>
+  </main>
+</div>
+
+<div class="overlay" id="qModal" hidden role="dialog" aria-modal="true" aria-label="Вопрос">
+  <div class="scrim" data-close="q"></div>
+  <div class="card" id="qcard">
+    <button class="qclose" id="qClose" aria-label="Закрыть вопрос без ответа">✕</button>
+    <div class="qtop"><span class="qcat" id="qCat"></span><span class="qval" id="qVal"></span></div>
+    <div class="qturn" id="qTurn"></div>
+    <p class="qtext" id="qText"></p>
+    <p class="qhint" id="qHint">Ответь вслух, а потом проверь себя 😉</p>
+    <button class="btn-reveal" id="revealBtn">🔎 Показать ответ</button>
+    <div id="answerBox" hidden>
+      <div class="answer"><span class="answer-label">Правильный ответ</span><p id="aText"></p></div>
+      <p class="fact" id="factText" hidden></p>
+      <div class="verdicts">
+        <button class="btn-ok" id="okBtn">✔ Верно! <b id="okVal">+100</b></button>
+        <button class="btn-no" id="noBtn">✘ Не угадал</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="confirmModal" hidden role="dialog" aria-modal="true" aria-label="Новая игра">
+  <div class="scrim" data-close="confirm"></div>
+  <div class="card small">
+    <div class="trophy" style="animation:none">🔄</div>
+    <h2>Начать новую игру?</h2>
+    <p class="sub">Очки обнулятся, а на поле появятся <b>совсем новые вопросы</b> из следующего выпуска!</p>
+    <button class="btn-gold" id="confirmYes">Да, начинаем!</button>
+    <button class="btn-ghost" id="confirmNo">Отмена</button>
+  </div>
+</div>
+
+<div class="overlay" id="winModal" hidden role="dialog" aria-modal="true" aria-label="Итоги игры">
+  <div class="scrim" data-close="win"></div>
+  <div class="card small">
+    <div class="trophy" id="winTrophy">🏆</div>
+    <h2 id="winTitle">Победа!</h2>
+    <p class="sub" id="winSub"></p>
+    <div class="win-scores">
+      <div class="chip" id="chip0"><div class="cn"></div><div class="cs"></div></div>
+      <div class="chip" id="chip1"><div class="cn"></div><div class="cs"></div></div>
+    </div>
+    <button class="btn-gold" id="winNew">✨ Новая игра — новые вопросы!</button>
+    <button class="btn-ghost" id="winView">Посмотреть поле</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<canvas id="fx"></canvas>
+<noscript><p style="position:fixed;inset:0;display:grid;place-items:center;background:#070620;color:#fff;z-index:999;text-align:center;padding:20px">Для игры нужен включённый JavaScript 😊</p></noscript>
+
+<script>
+'use strict';
+const VALUES=[100,200,300,400,500];
+const HUES={amber:'#ff9f1c',violet:'#8b5cf6',green:'#3ddc84',magenta:'#ff4fa3',teal:'#2dd4bf',rose:'#fb4d6d',blue:'#3fa9ff',lime:'#a3e635'};
+const PC=['#3fa9ff','#ff4fa3'];
+const AVATARS=['🦁','🦊','🐼','🐸','🦄','🐯','🐰','🐨','🐶','🐱','🚀','🌟'];
+
+const PACKS=[
+{title:'Звери и звёзды',cats:[
+ {name:'Животные',icon:'🦁',hue:'amber',qs:[
+  {q:'Какое животное называют царём зверей?',a:'Лев',f:'Грива, как корона, есть только у пап-львов.'},
+  {q:'У какого животного самая длинная шея?',a:'У жирафа',f:'Шея жирафа длиннее, чем рост твоего папы!'},
+  {q:'Кто из зверей спит всю зиму в берлоге?',a:'Медведь',f:'Просыпается он весной очень голодным.'},
+  {q:'Какой ящер умеет менять цвет, чтобы его не заметили?',a:'Хамелеон',f:'А ещё он «стреляет» языком длиннее самого себя!'},
+  {q:'Летучая мышь летает и спит вниз головой. Она птица, зверь или насекомое?',a:'Зверь! Она кормит малышей молоком',f:'Это единственный зверь, который умеет летать по-настоящему.'}]},
+ {name:'Космос',icon:'🚀',hue:'violet',qs:[
+  {q:'Что ярко светит нам днём на небе?',a:'Солнце',f:'Солнце — огромный горячий шар из газа.'},
+  {q:'Как называется планета, на которой мы живём?',a:'Земля',f:'Из космоса Земля голубая — это её океаны.'},
+  {q:'Как называют человека, который летает к звёздам на ракете?',a:'Космонавт',f:'Первым в космос полетел Юрий Гагарин.'},
+  {q:'Какая планета носит красивые кольца?',a:'Сатурн',f:'Его кольца сделаны из льда и камней.'},
+  {q:'Солнце — это планета или звезда?',a:'Звезда — самая близкая к нам',f:'Другие звёзды кажутся точками, потому что они очень-очень далеко.'}]},
+ {name:'Природа',icon:'🌳',hue:'green',qs:[
+  {q:'Что капает из туч: кап-кап?',a:'Дождь',f:'Капельки в туче сливаются и становятся тяжёлыми.'},
+  {q:'Когда листья желтеют и опадают: зимой, летом или осенью?',a:'Осенью',f:'Деревья так готовятся к холодной зиме.'},
+  {q:'Что появляется на небе после дождя, когда выглянет солнце?',a:'Радуга',f:'Солнечный луч играет в капельках воды, как в призме.'},
+  {q:'Сколько цветов у радуги?',a:'Семь',f:'Красный, оранжевый, жёлтый, зелёный, голубой, синий, фиолетовый.'},
+  {q:'Куда исчезает лужа в жаркий день?',a:'Вода испаряется — становится невидимым паром',f:'Пар поднимается в небо и превращается в облако.'}]},
+ {name:'Мультфильмы',icon:'📺',hue:'magenta',qs:[
+  {q:'Кто живёт в ананасе на дне океана?',a:'Губка Боб',f:'Его лучший друг — морская звезда Патрик.'},
+  {q:'Как зовут весёлого снеговика из «Холодного сердца»?',a:'Олаф',f:'Олаф больше всего мечтает увидеть лето.'},
+  {q:'Кто повторял: «Ребята, давайте жить дружно!»?',a:'Кот Леопольд',f:'Ему всё время мешали два озорных мышонка.'},
+  {q:'В каком мультфильме гоночная машинка зовётся Молния Маквин?',a:'«Тачки»',f:'Его номер — 95, а девиз: «Кчау!»'},
+  {q:'Как зовут панду — мастера кунг-фу?',a:'По',f:'Панда По работал в лапшичной, а стал воином дракона.'}]},
+ {name:'Сказки',icon:'📖',hue:'teal',qs:[
+  {q:'Кто разбил золотое яичко в сказке про курочку Рябу?',a:'Мышка — хвостиком махнула',f:'Дед бил-бил — не разбил, баба била-била — не разбила.'},
+  {q:'Что посадил дед, и оно выросло большим-пребольшим?',a:'Репку',f:'Вытянуть её помогла самая маленькая — мышка!'},
+  {q:'Из чего бабушка испекла Колобка?',a:'Из теста (из муки)',f:'Колобок ушёл и от зайца, и от волка, и от медведя.'},
+  {q:'Кто потерял хрустальную туфельку на балу?',a:'Золушка',f:'Карета Золушки была сделана из тыквы.'},
+  {q:'Сколько ЗВЕРЕЙ тянули репку? Считай: Жучка, кошка и мышка.',a:'Трое',f:'А всего тянули шестеро: дедка, бабка, внучка и три зверя.'}]},
+ {name:'Загадки',icon:'🧩',hue:'rose',qs:[
+  {q:'Зимой и летом одним цветом. Что это?',a:'Ёлка',f:'Ёлка не сбрасывает иголки на зиму.'},
+  {q:'Висит груша — нельзя скушать. Что это?',a:'Лампочка',f:'Она светит, когда по ней бежит ток.'},
+  {q:'Не лает, не кусает, а в дом не пускает.',a:'Замок',f:'Открывается только своим ключом.'},
+  {q:'Сто одёжек, и все без застёжек.',a:'Капуста',f:'Из неё варят щи и делают салат.'},
+  {q:'Что можно увидеть с закрытыми глазами?',a:'Сон',f:'Сны снятся всем людям и даже собакам.'}]},
+ {name:'Математика',icon:'🔢',hue:'blue',qs:[
+  {q:'Посчитай: 🍎🍎 + 🍎🍎. Сколько яблок?',a:'Четыре (2 + 2 = 4)',f:'Считать можно прямо по яблокам!'},
+  {q:'У Маши было 3 конфеты, ей дали ещё 2. Сколько стало?',a:'Пять',f:'3 + 2 = 5. Можно посчитать на пальцах.'},
+  {q:'Продолжи ряд: 2, 4, 6, 8, … Какое число дальше?',a:'10 — считаем через два',f:'Это чётные числа, они «прыгают» через одно.'},
+  {q:'У паука 8 лап, а у жука 6. У кого лап больше и на сколько?',a:'У паука, на 2 лапы',f:'8 − 6 = 2. Поэтому паук — не насекомое!'},
+  {q:'На столе лежало 5 яблок. Ты забрал 2. Сколько яблок у ТЕБЯ?',a:'Два — ведь ты забрал именно два!',f:'На столе осталось три, но вопрос был про тебя. Вот и подвох!'}]},
+ {name:'Хитрые вопросы',icon:'🎩',hue:'lime',qs:[
+  {q:'Сколько хвостов у трёх котов?',a:'Три',f:'У каждого кота ровно один хвост.'},
+  {q:'Что тяжелее: килограмм ваты или килограмм гвоздей?',a:'Одинаково — оба по килограмму!',f:'Ваты просто намного больше по размеру.'},
+  {q:'На берёзе выросло 5 яблок. 2 упало. Сколько осталось на берёзе?',a:'Нисколько: на берёзе яблоки не растут!',f:'Яблоки растут на яблоне.'},
+  {q:'Что нельзя съесть на завтрак?',a:'Обед и ужин',f:'Их едят в другое время дня!'},
+  {q:'Горело 5 свечей. Ветер задул 2. Сколько свечей осталось в комнате?',a:'Две: остальные сгорели без остатка',f:'Задутые свечи сохранились, а горящие растаяли полностью.'}]}
+]},
+{title:'Большое путешествие',cats:[
+ {name:'Динозавры',icon:'🦖',hue:'green',qs:[
+  {q:'Тираннозавр ел мясо или траву?',a:'Мясо — он хищник',f:'Зубы тираннозавра были размером с банан!'},
+  {q:'Из чего вылуплялись малыши динозавров?',a:'Из яиц',f:'Некоторые яйца динозавров были больше футбольного мяча.'},
+  {q:'У какого динозавра на голове три рога?',a:'Трицератопс',f:'Его имя так и значит — «трёхрогая морда».'},
+  {q:'Как называют учёного, который раскапывает и изучает динозавров?',a:'Палеонтолог',f:'Он работает кисточкой, как художник, чтобы не сломать кости.'},
+  {q:'Динозавры вымерли до появления людей или после?',a:'Задолго до людей — миллионы лет назад',f:'О них мы знаем только по костям-окаменелостям и следам.'}]},
+ {name:'Морские жители',icon:'🐠',hue:'blue',qs:[
+  {q:'Кто выпускает чёрные чернила, чтобы спрятаться от врагов?',a:'Осьминог',f:'У осьминога ещё и три сердца!'},
+  {q:'Какой морской житель похож на шахматную лошадку?',a:'Морской конёк',f:'У морских коньков малышей вынашивает папа.'},
+  {q:'Медуза красивая и прозрачная. Можно ли её трогать?',a:'Нет — она может обжечь',f:'Даже медуза на пляже может «щипнуть». Лучше просто смотреть.'},
+  {q:'Чем рыба дышит под водой?',a:'Жабрами',f:'Жабры достают из воды воздух, как лёгкие из атмосферы.'},
+  {q:'Кит — самый большой житель моря. Он рыба или зверь?',a:'Зверь: дышит лёгкими и кормит малышей молоком',f:'Кит всплывает подышать через дырочку на спине — фонтанчик!'}]},
+ {name:'Вкусная еда',icon:'🍕',hue:'amber',qs:[
+  {q:'Из чего делают мороженое: из молока или из картошки?',a:'Из молока и сливок',f:'Самое большое мороженое весило как слон!'},
+  {q:'Какая красная ягода носит семечки снаружи?',a:'Клубника',f:'На одной клубничке около 200 семечек.'},
+  {q:'Какой овощ заставляет плакать, когда его режут?',a:'Лук',f:'Лук выпускает невидимый газ, который щиплет глаза.'},
+  {q:'Арбуз — это фрукт, овощ или ягода?',a:'Ягода! Самая большая на свете',f:'Учёные называют её «тыквиной» — ягоде он родственник.'},
+  {q:'Ананас растёт на пальме или прямо на земле?',a:'На земле — на низком колючем кустике',f:'На пальмах растут кокосы, а ананас сидит на травянистом стебле.'}]},
+ {name:'Профессии',icon:'👩‍🚒',hue:'rose',qs:[
+  {q:'Кто лечит людей, когда они болеют?',a:'Врач',f:'Врач слушает лёгкие трубкой — стетоскопом.'},
+  {q:'Кто тушит пожары на большой красной машине?',a:'Пожарный',f:'Пожарные ещё и спасают котиков с деревьев.'},
+  {q:'Кто управляет самолётом в небе?',a:'Пилот (лётчик)',f:'В кабине самолёта больше сотни кнопок и приборов!'},
+  {q:'Кто придумывает дома и рисует чертежи для стройки?',a:'Архитектор',f:'Сначала дом живёт на бумаге, а потом его строят.'},
+  {q:'Как называют учёного, который наблюдает за звёздами?',a:'Астроном',f:'Он смотрит в телескоп в доме с круглой крышей — обсерватории.'}]},
+ {name:'Моё тело',icon:'🖐️',hue:'magenta',qs:[
+  {q:'Чем мы нюхаем цветы?',a:'Носом',f:'Нос умеет различать тысячи запахов.'},
+  {q:'Сколько пальцев на одной руке?',a:'Пять',f:'А на двух руках и двух ногах — целых двадцать!'},
+  {q:'Что стучит в груди и гоняет кровь по всему телу?',a:'Сердце',f:'Приложи ладонь к груди слева — почувствуешь: тук-тук!'},
+  {q:'Зачем мы моргаем?',a:'Чтобы смочить и очистить глаза',f:'Слёзки смывают пыль, как дворники на машине.'},
+  {q:'Сколько костей у человека: около 20, 200 или 2000?',a:'Около 200',f:'У малышей костей даже больше — часть срастается с возрастом.'}]},
+ {name:'Транспорт',icon:'🚗',hue:'violet',qs:[
+  {q:'Что едет по рельсам и гудит «ту-ту»?',a:'Поезд',f:'Самые длинные поезда тянут больше ста вагонов.'},
+  {q:'У чего два колеса, руль и педали?',a:'Велосипед',f:'Первые велосипеды были деревянными и без педалей!'},
+  {q:'Что плывёт по морю с палубами и трубой?',a:'Корабль (пароход)',f:'Огромные корабли перевозят даже целые города контейнеров.'},
+  {q:'У вертолёта нет крыльев. Что крутится у него сверху?',a:'Винт — большие лопасти',f:'Поэтому вертолёт умеет висеть на месте и садиться где угодно.'},
+  {q:'Он летает без мотора: огромный шар с горячим воздухом и корзиной снизу. Что это?',a:'Воздушный шар',f:'Горячий воздух легче холодного — поэтому шар поднимается.'}]},
+ {name:'Спорт',icon:'⚽',hue:'lime',qs:[
+  {q:'В какой игре мяч забивают в ворота ногами?',a:'Футбол',f:'Руками мяч трогает только вратарь.'},
+  {q:'Чем отбивают мячик в теннисе?',a:'Ракеткой',f:'Теннисный мячик прыгает даже с высоты трёх этажей!'},
+  {q:'На чём катаются фигуристы по льду?',a:'На коньках',f:'Лезвие конька тонкое, как монетка.'},
+  {q:'Сколько игроков одной команды на футбольном поле: 5, 11 или 20?',a:'11',f:'Один из них — вратарь, он стоит на воротах.'},
+  {q:'Что означают 5 колец на олимпийском флаге?',a:'Пять частей света — континентов',f:'Спортсмены со всего мира съезжаются на Олимпиаду раз в 4 года.'}]},
+ {name:'Смекалка',icon:'🧠',hue:'teal',qs:[
+  {q:'Днём светло, а ночью…?',a:'Темно',f:'Земля поворачивается к солнышку то одним боком, то другим.'},
+  {q:'Что лишнее: яблоко, груша, морковь?',a:'Морковь — это овощ, а остальное фрукты',f:'Морковь растёт в земле, а яблоки и груши — на деревьях.'},
+  {q:'Маша выше Даши, а Даша выше Кати. Кто ниже всех?',a:'Катя',f:'Представь их лесенкой: Маша — верхняя ступенька, Катя — нижняя.'},
+  {q:'Ты стоишь в очереди третьим. Сколько человек перед тобой?',a:'Двое',f:'Первый и второй — вот кто стоит впереди.'},
+  {q:'У трёх братьев есть одна сестра. Сколько всего детей в семье?',a:'Четверо: три брата и одна общая сестра',f:'Сестра одна и та же для всех братьев — её не нужно считать трижды!'}]}
+]},
+{title:'Почемучки',cats:[
+ {name:'Насекомые',icon:'🐜',hue:'lime',qs:[
+  {q:'Кто порхает над цветами с большими красивыми крыльями?',a:'Бабочка',f:'Раньше бабочка была гусеницей!'},
+  {q:'Кто живёт в улье и делает мёд?',a:'Пчела',f:'За баночку мёда пчёлы облетают миллион цветков.'},
+  {q:'Сколько лап у настоящего насекомого?',a:'Шесть',f:'По лапам учёные сразу отличают насекомых от других.'},
+  {q:'Паук — насекомое или нет?',a:'Нет! У паука 8 лап, а у насекомых 6',f:'Пауки — родственники скорпионов, а не жуков.'},
+  {q:'Гусеница не сразу станет бабочкой. Во что она превращается сначала?',a:'В куколку',f:'Внутри куколки гусеница полностью перестраивается — вот это фокус!'}]},
+ {name:'Вокруг света',icon:'🌍',hue:'blue',qs:[
+  {q:'Как называется столица России?',a:'Москва',f:'На башнях Кремля горят рубиновые звёзды.'},
+  {q:'Где живут кенгуру: в Африке или в Австралии?',a:'В Австралии',f:'Малыш кенгуру живёт в сумке у мамы.'},
+  {q:'В какой стране стоят древние пирамиды?',a:'В Египте',f:'Пирамиды построили больше 4000 лет назад — без кранов!'},
+  {q:'Как называется самая высокая гора на Земле?',a:'Эверест',f:'Её вершина выше облаков — почти 9 километров!'},
+  {q:'Панды живут в дикой природе только в одной стране. В какой?',a:'В Китае',f:'Панда ест бамбук почти весь день — до 12 часов!'}]},
+ {name:'Цвета и формы',icon:'🎨',hue:'magenta',qs:[
+  {q:'Какого цвета спелый помидор?',a:'Красного',f:'А зелёный помидор ещё не дозрел.'},
+  {q:'У какой фигуры совсем нет углов?',a:'У круга',f:'Поэтому колесо — круглое: оно катится легко.'},
+  {q:'Смешаем синюю и жёлтую краску. Какой цвет получится?',a:'Зелёный',f:'Как трава и листья летом!'},
+  {q:'Смешаем красную краску с белой. Что получится?',a:'Розовый',f:'Белая краска делает любой цвет светлее и нежнее.'},
+  {q:'У квадратного листа 4 угла. Один угол отрезали ножницами. Сколько углов стало?',a:'Пять! Разрез добавил два новых угла',f:'Проверь на бумажке — это настоящий фокус!'}]},
+ {name:'Музыка',icon:'🎵',hue:'violet',qs:[
+  {q:'На чём стучат палочками: на барабане или на скрипке?',a:'На барабане',f:'Барабан — один из самых древних инструментов.'},
+  {q:'У какого инструмента чёрные и белые клавиши?',a:'Пианино (рояль)',f:'Всего клавиш у пианино 88!'},
+  {q:'На каком инструменте играют смычком?',a:'На скрипке',f:'Скрипка умеет «петь», как человеческий голос.'},
+  {q:'Сколько струн у обычной гитары?',a:'Шесть',f:'Если прижать струну пальцем, звук станет выше.'},
+  {q:'Кто машет палочкой и управляет целым оркестром?',a:'Дирижёр',f:'Музыканты смотрят на него, чтобы играть дружно.'}]},
+ {name:'Дом и вещи',icon:'🏠',hue:'teal',qs:[
+  {q:'Что висит на стене и показывает мультики?',a:'Телевизор',f:'Первые телевизоры были с крошечным круглым экраном.'},
+  {q:'Что хранит продукты в холоде, чтобы они не портились?',a:'Холодильник',f:'В холоде микробы почти не размножаются.'},
+  {q:'Чем подметают пол?',a:'Веником или шваброй',f:'А робот-пылесос делает это сам!'},
+  {q:'Какой умный помощник сам ездит по полу и собирает пыль?',a:'Робот-пылесос',f:'Он сам находит дорогу к своей зарядке.'},
+  {q:'Без чего не работают ни телевизор, ни холодильник, ни лампочка?',a:'Без электричества',f:'Ток бежит по проводам, как вода по трубам.'}]},
+ {name:'Буквы и слова',icon:'🔤',hue:'rose',qs:[
+  {q:'Какая буква самая первая в алфавите?',a:'А',f:'А последняя — Я. В русском алфавите 33 буквы.'},
+  {q:'С какой буквы начинается слово «кот»?',a:'К',f:'К-о-т — всего три буквы!'},
+  {q:'Сколько букв в слове «мама»?',a:'Четыре',f:'М-а-м-а. Буква «а» встречается два раза.'},
+  {q:'Прочитай слово «кот» наоборот. Что получится?',a:'«Ток»',f:'Ток живёт в розетке — а кот на коврике!'},
+  {q:'Какая буква стоит точно в середине слова «сахар»?',a:'Х: с-а-Х-а-р',f:'В слове 5 букв, значит серединка — третья.'}]},
+ {name:'Верю — не верю',icon:'✅',hue:'green',qs:[
+  {q:'Верю — не верю: снег горячий!',a:'Не верю — снег холодный',f:'Снег — это замёрзшие капельки воды.'},
+  {q:'Верю — не верю: кошки умеют летать, как птицы.',a:'Не верю',f:'Зато кошки прыгают в 5 раз выше своего роста!'},
+  {q:'Верю — не верю: зимой медведь спит в берлоге.',a:'Верю',f:'Всю зиму он не ест и не пьёт.'},
+  {q:'Верю — не верю: пингвины и белые медведи живут вместе на Северном полюсе.',a:'Не верю: пингвины на юге, медведи на севере',f:'Пингвины — в Антарктиде, медведи — в Арктике. Они никогда не встречались!'},
+  {q:'Верю — не верю: у осьминога три сердца.',a:'Верю! Целых три',f:'Два качают кровь к жабрам, а третье — по всему телу.'}]},
+ {name:'Праздники',icon:'🎪',hue:'amber',qs:[
+  {q:'Какой праздник с тортом, свечами и подарками бывает у каждого раз в год?',a:'День рождения',f:'Свечек на торте столько, сколько тебе исполняется лет.'},
+  {q:'Кто приходит на Новый год с мешком подарков и внучкой Снегурочкой?',a:'Дед Мороз',f:'У него есть даже свой город — Великий Устюг.'},
+  {q:'Что наряжают игрушками на Новый год?',a:'Ёлку',f:'Раньше ёлки украшали яблоками и конфетами.'},
+  {q:'Что загадывают, когда бьют куранты в новогоднюю ночь?',a:'Желание',f:'Куранты бьют 12 раз — успей загадать!'},
+  {q:'На какой праздник красят яйца и пекут куличи?',a:'Пасха',f:'Крашеные яйца называют крашанками и писанками.'}]}
+]}];
+
+const KEY='svoya-kids-v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;};
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function fresh(){return{pack:0,names:['Игрок 1','Игрок 2'],av:[0,1],scores:[0,0],turn:0,start:0,played:Array(40).fill(false),sound:true,finished:false};}
+function load(){
+  try{const d=JSON.parse(localStorage.getItem(KEY));
+    if(!d||!Array.isArray(d.played)||d.played.length!==40||!Array.isArray(d.scores)||d.scores.length!==2)return null;
+    const s=Object.assign(fresh(),d);
+    s.pack=Math.min(Math.max(0,s.pack|0),PACKS.length-1);
+    s.turn=s.turn===1?1:0; s.start=s.start===1?1:0;
+    s.played=s.played.map(Boolean); s.scores=s.scores.map(v=>Math.max(0,v|0));
+    s.names=s.names.map((n,i)=>String(n||'').slice(0,14)||`Игрок ${i+1}`);
+    s.av=s.av.map(v=>Math.min(Math.max(0,v|0),AVATARS.length-1));
+    return s;
+  }catch(e){return null;}
+}
+let S=load()||fresh();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+let AC=null,master=null,noiseBuf=null,gestured=false;
+function audio(){
+  if(!gestured)return null;
+  if(!AC){try{
+    AC=new (window.AudioContext||window.webkitAudioContext)();
+    master=AC.createGain();master.gain.value=S.sound ? 0.4 : 0;master.connect(AC.destination);
+  }catch(e){return null;}}
+  if(AC.state==='suspended')AC.resume();
+  return AC;
+}
+addEventListener('pointerdown',()=>{gestured=true;if(S.sound)audio();});
+addEventListener('keydown',()=>{gestured=true;});
+function tone(f,{t=0,d=.15,type='sine',v=.5,to=null}={}){
+  if(!S.sound||!audio())return;
+  const o=AC.createOscillator(),g=AC.createGain(),now=AC.currentTime+t;
+  o.type=type;o.frequency.setValueAtTime(f,now);
+  if(to)o.frequency.exponentialRampToValueAtTime(to,now+d);
+  g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(v,now+.012);
+  g.gain.exponentialRampToValueAtTime(.0001,now+d);
+  o.connect(g);g.connect(master);o.start(now);o.stop(now+d+.05);
+}
+function noise({t=0,d=.3,v=.3,f=1800,q=1}={}){
+  if(!S.sound||!audio())return;
+  if(!noiseBuf){noiseBuf=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);
+    const ch=noiseBuf.getChannelData(0);for(let i=0;i<ch.length;i++)ch[i]=Math.random()*2-1;}
+  const src=AC.createBufferSource();src.buffer=noiseBuf;src.loop=true;
+  const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=f;bp.Q.value=q;
+  const g=AC.createGain(),now=AC.currentTime+t;
+  g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(v,now+.01);
+  g.gain.exponentialRampToValueAtTime(.0001,now+d);
+  src.connect(bp);bp.connect(g);g.connect(master);src.start(now);src.stop(now+d+.05);
+}
+function applause(t0,dur){
+  if(!S.sound||!audio())return;
+  const n=Math.round(dur*16);
+  for(let i=0;i<n;i++)noise({t:t0+Math.random()*dur,d:.05+Math.random()*.04,v:.11*(1-i/n*.6),f:1200+Math.random()*2600,q:.8});
+}
+const sfx={
+  click(){tone(1600,{d:.05,type:'square',v:.1});},
+  open(){tone(300,{d:.3,type:'sawtooth',v:.18,to:900});tone(1200,{t:.12,d:.2,type:'triangle',v:.14,to:1800});},
+  reveal(){tone(659,{d:.12,type:'triangle',v:.3});tone(880,{t:.1,d:.28,type:'triangle',v:.3});},
+  correct(){[523,659,784,1047].forEach((f,i)=>tone(f,{t:i*.09,d:.22,type:'triangle',v:.32}));applause(.18,.9);},
+  wrong(){tone(311,{d:.25,type:'sine',v:.28,to:262});tone(262,{t:.22,d:.4,type:'sine',v:.28,to:196});},
+  turn(){tone(700,{d:.08,type:'sine',v:.18,to:1000});},
+  win(){[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,{t:i*.13,d:.3,type:'triangle',v:.32}));applause(.4,2.2);},
+  whoosh(){noise({d:.5,v:.22,f:800});tone(600,{d:.45,type:'sine',v:.14,to:150});}
+};
+
+const bg=$('#bg'),fx=$('#fx'),bctx=bg.getContext('2d'),fctx=fx.getContext('2d');
+const CONF_COLORS=['#ffc233','#3fa9ff','#ff4fa3','#3ddc84','#8b5cf6','#2dd4bf','#a3e635','#ffffff'];
+let W=0,H=0,stars=[],bokeh=[],parts=[],rainUntil=0,last=0;
+function resize(){
+  W=innerWidth;H=innerHeight;
+  const dpr=Math.min(devicePixelRatio||1,2);
+  [bg,fx].forEach(c=>{c.width=W*dpr;c.height=H*dpr;c.style.width=W+'px';c.style.height=H+'px';});
+  bctx.setTransform(dpr,0,0,dpr,0,0);fctx.setTransform(dpr,0,0,dpr,0,0);
+  const n=Math.min(150,Math.round(W*H/9000));
+  stars=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,r:.5+Math.random()*1.4,ph:Math.random()*6.28,sp:.5+Math.random()*1.4,gold:Math.random()<.18}));
+  bokeh=Array.from({length:10},()=>({x:Math.random()*W,y:Math.random()*H,r:45+Math.random()*80,c:CONF_COLORS[Math.random()*7|0],vx:(Math.random()-.5)*12,vy:(Math.random()-.5)*8,a:.04+Math.random()*.05}));
+}
+addEventListener('resize',resize);
+function burst(x,y,n){
+  if(RM)n=Math.min(n,18);
+  for(let i=0;i<n;i++){
+    const ang=Math.random()*Math.PI*2,sp=180+Math.random()*470;
+    parts.push({x,y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp-240,rot:Math.random()*6.28,vr:(Math.random()-.5)*12,
+      c:CONF_COLORS[Math.random()*CONF_COLORS.length|0],s:5+Math.random()*5,life:0,ttl:1.4+Math.random()*.9,round:Math.random()<.3});
+  }
+}
+function rain(ms){rainUntil=performance.now()+ms;}
+function loop(t){
+  requestAnimationFrame(loop);
+  const dt=Math.min((t-last)/1000||0,.05);last=t;
+  if(document.hidden)return;
+  bctx.clearRect(0,0,W,H);
+  for(const b of bokeh){
+    b.x+=b.vx*dt;b.y+=b.vy*dt;
+    if(b.x<-b.r)b.x=W+b.r;if(b.x>W+b.r)b.x=-b.r;
+    if(b.y<-b.r)b.y=H+b.r;if(b.y>H+b.r)b.y=-b.r;
+    bctx.globalAlpha=b.a;bctx.fillStyle=b.c;
+    bctx.beginPath();bctx.arc(b.x,b.y,b.r,0,6.28);bctx.fill();
+  }
+  const ts=t/1000;
+  for(const s of stars){
+    bctx.globalAlpha=.25+.6*(.5+.5*Math.sin(ts*s.sp+s.ph));
+    bctx.fillStyle=s.gold?'#ffd76a':'#e8e6ff';
+    bctx.beginPath();bctx.arc(s.x,s.y,s.r,0,6.28);bctx.fill();
+  }
+  bctx.globalAlpha=1;
+  fctx.clearRect(0,0,W,H);
+  if(t<rainUntil&&!RM){
+    for(let i=0;i<3;i++)parts.push({x:Math.random()*W,y:-14,vx:(Math.random()-.5)*120,vy:120+Math.random()*160,
+      rot:Math.random()*6.28,vr:(Math.random()-.5)*10,c:CONF_COLORS[Math.random()*CONF_COLORS.length|0],s:6+Math.random()*5,life:0,ttl:3.4,round:Math.random()<.3});
+  }
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];p.life+=dt;
+    p.vy+=780*dt;p.vx*=(1-1.1*dt);
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.vr*dt;
+    if(p.life>p.ttl||p.y>H+30){parts.splice(i,1);continue;}
+    fctx.save();fctx.translate(p.x,p.y);fctx.rotate(p.rot);
+    fctx.globalAlpha=Math.min(1,(p.ttl-p.life)/.4);fctx.fillStyle=p.c;
+    if(p.round){fctx.beginPath();fctx.arc(0,0,p.s*.42,0,6.28);fctx.fill();}
+    else fctx.fillRect(-p.s/2,-p.s*.3,p.s,p.s*.6);
+    fctx.restore();
+  }
+}
+document.addEventListener('visibilitychange',()=>{last=performance.now();});
+document.addEventListener('contextmenu',e=>e.preventDefault());
+
+const board=$('#board'),turnBanner=$('#turnBanner'),packPill=$('#packPill'),
+progText=$('#progText'),progFill=$('#progFill'),toastEl=$('#toast'),app=$('#app'),
+pEl=[$('#p0'),$('#p1')],scoreEls=[$('#score0'),$('#score1')],
+qModal=$('#qModal'),qcard=$('#qcard'),qCat=$('#qCat'),qVal=$('#qVal'),qTurn=$('#qTurn'),
+qText=$('#qText'),qHint=$('#qHint'),revealBtn=$('#revealBtn'),answerBox=$('#answerBox'),
+aText=$('#aText'),factText=$('#factText'),okBtn=$('#okBtn'),noBtn=$('#noBtn'),okVal=$('#okVal'),qClose=$('#qClose'),
+confirmModal=$('#confirmModal'),winModal=$('#winModal');
+let cur=null,busy=false,toastTimer=null,openCount=0;
+const shown=[0,0],tweens=[null,null];
+
+function show(el){el.hidden=false;openCount++;app.inert=true;}
+function hide(el){if(el.hidden)return;el.hidden=true;openCount=Math.max(0,openCount-1);if(!openCount)app.inert=false;}
+function toast(msg){
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2600);
+}
+function setScore(i,to,anim){
+  cancelAnimationFrame(tweens[i]);
+  const from=shown[i];
+  if(!anim||RM||from===to){shown[i]=to;scoreEls[i].textContent=to;return;}
+  const t0=performance.now(),dur=650;
+  const step=n=>{const k=Math.min(1,(n-t0)/dur),e=1-Math.pow(1-k,3);
+    shown[i]=Math.round(from+(to-from)*e);scoreEls[i].textContent=shown[i];
+    if(k<1)tweens[i]=requestAnimationFrame(step);};
+  tweens[i]=requestAnimationFrame(step);
+}
+function floatScore(i,val){
+  const s=document.createElement('span');s.className='float';s.textContent='+'+val;
+  pEl[i].appendChild(s);s.addEventListener('animationend',()=>s.remove());
+  pEl[i].classList.remove('bump');void pEl[i].offsetWidth;pEl[i].classList.add('bump');
+}
+function renderPlayers(){
+  [0,1].forEach(i=>{
+    pEl[i].classList.toggle('active',S.turn===i&&!S.finished);
+    pEl[i].querySelector('.avatar').textContent=AVATARS[S.av[i]];
+    pEl[i].querySelector('.nm').textContent=S.names[i];
+  });
+  if(S.finished){
+    turnBanner.innerHTML='🏁 Игра окончена! Нажми «Новая игра» — будут новые вопросы!';
+    turnBanner.style.background='rgba(255,194,51,.1)';turnBanner.style.borderColor='rgba(255,194,51,.5)';
+  }else{
+    const pc=PC[S.turn];
+    turnBanner.innerHTML=`🎯 Ходит <b style="color:${pc}">${AVATARS[S.av[S.turn]]} ${esc(S.names[S.turn])}</b>&nbsp;— выбирай вопрос!`;
+    turnBanner.style.background=hexA(pc,.13);turnBanner.style.borderColor=hexA(pc,.5);
+  }
+}
+function renderBoard(){
+  const pack=PACKS[S.pack];
+  board.innerHTML='';
+  pack.cats.forEach((c,ci)=>{
+    const hue=HUES[c.hue];
+    const col=document.createElement('div');col.className='cat';
+    col.style.setProperty('--cat',hue);
+    col.style.setProperty('--catSoft',hexA(hue,.4));
+    col.style.setProperty('--catFaint',hexA(hue,.13));
+    col.style.setProperty('--catGlow',hexA(hue,.5));
+    const head=document.createElement('div');head.className='cat-head';
+    head.innerHTML=`<span class="cat-ico">${c.icon}</span><span class="cat-name">${esc(c.name)}</span><span class="cat-count"></span>`;
+    col.appendChild(head);
+    const cells=document.createElement('div');cells.className='cells';
+    c.qs.forEach((q,qi)=>{
+      const idx=ci*5+qi;
+      const b=document.createElement('button');b.className='cell';b.dataset.idx=idx;
+      b.innerHTML=`<span class="cell-val">${VALUES[qi]}</span><span class="cell-check">✓</span>`;
+      b.addEventListener('click',()=>openQ(idx));
+      cells.appendChild(b);
+    });
+    col.appendChild(cells);board.appendChild(col);
+  });
+  packPill.textContent=`🎬 Выпуск ${S.pack+1} · «${pack.title}»`;
+  refreshBoard();
+}
+function refreshBoard(){
+  const pack=PACKS[S.pack];let done=0;
+  board.querySelectorAll('.cat').forEach((col,ci)=>{
+    let cd=0;
+    col.querySelectorAll('.cell').forEach((b,qi)=>{
+      const idx=ci*5+qi,isDone=S.played[idx];
+      b.classList.toggle('done',isDone);b.disabled=isDone;
+      b.setAttribute('aria-label',`${pack.cats[ci].name}: ${VALUES[qi]} баллов${isDone?', уже сыграно':''}`);
+      if(isDone){cd++;done++;}
+    });
+    col.querySelector('.cat-count').textContent=`${cd}/5`;
+  });
+  progText.textContent=`${done} / 40`;
+  progFill.style.width=(done/40*100)+'%';
+}
+
+function openQ(idx){
+  if(S.played[idx]||busy||S.finished)return;
+  cur={idx,val:VALUES[idx%5]};
+  const c=PACKS[S.pack].cats[Math.floor(idx/5)],q=c.qs[idx%5],hue=HUES[c.hue];
+  qcard.style.setProperty('--cat',hue);
+  qcard.style.setProperty('--catSoft',hexA(hue,.5));
+  qcard.style.setProperty('--catFaint',hexA(hue,.14));
+  qCat.textContent=`${c.icon} ${c.name}`;
+  qVal.textContent=cur.val;
+  qTurn.innerHTML=`Отвечает: <b style="color:${PC[S.turn]}">${AVATARS[S.av[S.turn]]} ${esc(S.names[S.turn])}</b>`;
+  qText.textContent=q.q;
+  aText.textContent=q.a;
+  factText.hidden=!q.f;
+  if(q.f)factText.textContent='💡 Это интересно: '+q.f;
+  okVal.textContent='+'+cur.val;
+  qcard.classList.remove('good','bad');
+  revealBtn.hidden=false;qHint.hidden=false;answerBox.hidden=true;
+  qClose.disabled=false;okBtn.disabled=false;noBtn.disabled=false;
+  show(qModal);qcard.scrollTop=0;
+  sfx.open();
+  setTimeout(()=>revealBtn.focus(),60);
+}
+function closeQ(){if(busy)return;hide(qModal);cur=null;sfx.click();}
+revealBtn.addEventListener('click',()=>{
+  revealBtn.hidden=true;qHint.hidden=true;answerBox.hidden=false;
+  sfx.reveal();setTimeout(()=>okBtn.focus(),60);
+});
+function verdict(ok){
+  if(busy||!cur)return;busy=true;
+  okBtn.disabled=noBtn.disabled=true;qClose.disabled=true;
+  const{idx,val}=cur,p=S.turn;
+  S.played[idx]=true;
+  if(ok){
+    S.scores[p]+=val;setScore(p,S.scores[p],true);floatScore(p,val);
+    qcard.classList.add('good');sfx.correct();
+    const r=qcard.getBoundingClientRect();
+    burst(r.left+r.width/2,r.top+r.height*.45,110);
+  }else{
+    qcard.classList.add('bad');sfx.wrong();
+  }
+  refreshBoard();save();
+  setTimeout(()=>{
+    hide(qModal);busy=false;cur=null;
+    if(S.played.every(Boolean)){finish();}
+    else{
+      S.turn=1-p;save();renderPlayers();sfx.turn();
+      toast(ok?`+${val}! Теперь ходит ${S.names[S.turn]} ${AVATARS[S.av[S.turn]]}`:`Не беда, очки не снимаем! Ходит ${S.names[S.turn]} ${AVATARS[S.av[S.turn]]}`);
+    }
+  },1050);
+}
+okBtn.addEventListener('click',()=>verdict(true));
+noBtn.addEventListener('click',()=>verdict(false));
+qClose.addEventListener('click',closeQ);
+
+function finish(){
+  S.finished=true;save();renderPlayers();
+  setTimeout(showWin,450);
+}
+function showWin(){
+  const[a,b]=S.scores,tie=a===b,w=a>b?0:1;
+  $('#winTrophy').textContent=tie?'🤝':'🏆';
+  $('#winTitle').textContent=tie?'Ничья!':'Победа!';
+  $('#winSub').innerHTML=tie
+    ?'Победила дружба — вы оба большие молодцы! 🎉'
+    :`${AVATARS[S.av[w]]} <b style="color:${PC[w]}">${esc(S.names[w])}</b> набирает ${Math.max(a,b)} очков! Ура! 🎉`;
+  [0,1].forEach(i=>{
+    const chip=$('#chip'+i);
+    chip.style.setProperty('--pc',PC[i]);chip.style.setProperty('--pcFaint',hexA(PC[i],.12));
+    chip.querySelector('.cn').textContent=(!tie&&i===w?'👑 ':'')+AVATARS[S.av[i]]+' '+S.names[i];
+    chip.querySelector('.cs').textContent=S.scores[i];
+  });
+  show(winModal);
+  rain(RM?600:4200);
+  burst(W*.2,H*.25,60);burst(W*.8,H*.25,60);
+  sfx.win();
+}
+function doNewGame(){
+  S.pack=(S.pack+1)%PACKS.length;
+  S.scores=[0,0];S.played=Array(40).fill(false);
+  S.start=1-S.start;S.turn=S.start;S.finished=false;
+  busy=false;cur=null;
+  hide(qModal);hide(confirmModal);hide(winModal);
+  setScore(0,0,false);setScore(1,0,false);
+  renderBoard();renderPlayers();save();
+  sfx.whoosh();
+  toast(`✨ Новые вопросы готовы! Первый ход: ${S.names[S.turn]} ${AVATARS[S.av[S.turn]]}`);
+  scrollTo({top:0,behavior:RM?'auto':'smooth'});
+}
+$('#newBtn').addEventListener('click',()=>{
+  sfx.click();
+  const started=S.played.some(Boolean)||S.scores[0]+S.scores[1]>0;
+  if(started&&!S.finished)show(confirmModal);else doNewGame();
+});
+$('#confirmYes').addEventListener('click',doNewGame);
+$('#confirmNo').addEventListener('click',()=>{hide(confirmModal);sfx.click();});
+$('#winNew').addEventListener('click',doNewGame);
+$('#winView').addEventListener('click',()=>{hide(winModal);sfx.click();});
+document.querySelectorAll('.scrim').forEach(sc=>sc.addEventListener('click',()=>{
+  const k=sc.dataset.close;
+  if(k==='q')closeQ();
+  else if(k==='confirm')hide(confirmModal);
+  else if(k==='win')hide(winModal);
+}));
+addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(!confirmModal.hidden)hide(confirmModal);
+  else if(!winModal.hidden)hide(winModal);
+  else if(!qModal.hidden)closeQ();
+});
+
+document.querySelectorAll('.name-btn').forEach(btn=>btn.addEventListener('click',()=>{
+  const i=+btn.dataset.name;
+  if(btn.parentElement.querySelector('.name-input'))return;
+  sfx.click();
+  const inp=document.createElement('input');
+  inp.className='name-input';inp.value=S.names[i];inp.maxLength=14;
+  inp.setAttribute('aria-label','Имя игрока '+(i+1));
+  btn.hidden=true;btn.after(inp);inp.focus();inp.select();
+  let cancel=false;
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter')inp.blur();
+    if(e.key==='Escape'){cancel=true;inp.blur();}
+    e.stopPropagation();
+  });
+  inp.addEventListener('blur',()=>{
+    if(!cancel){const v=inp.value.trim();if(v)S.names[i]=v;}
+    inp.remove();btn.hidden=false;save();renderPlayers();
+  });
+}));
+document.querySelectorAll('.avatar').forEach(btn=>btn.addEventListener('click',()=>{
+  const i=+btn.dataset.av;
+  S.av[i]=(S.av[i]+1)%AVATARS.length;
+  save();renderPlayers();sfx.click();
+}));
+
+const soundBtn=$('#soundBtn');
+function renderSound(){
+  soundBtn.innerHTML=(S.sound?'🔊':'🔇')+' <span class="lbl">'+(S.sound?'Звук':'Тихо')+'</span>';
+  soundBtn.classList.toggle('off',!S.sound);
+  soundBtn.setAttribute('aria-pressed',String(S.sound));
+}
+soundBtn.addEventListener('click',()=>{
+  S.sound=!S.sound;save();renderSound();
+  if(AC)master.gain.setTargetAtTime(S.sound ? 0.4 : 0,AC.currentTime,.01);
+  if(S.sound){audio();sfx.turn();}
+});
+
+[0,1].forEach(i=>{
+  pEl[i].style.setProperty('--pc',PC[i]);
+  pEl[i].style.setProperty('--pcGlow',hexA(PC[i],.45));
+  pEl[i].style.setProperty('--pcFaint',hexA(PC[i],.14));
+});
+resize();
+requestAnimationFrame(t=>{last=t;requestAnimationFrame(loop);});
+renderBoard();renderPlayers();renderSound();
+setScore(0,S.scores[0],false);setScore(1,S.scores[1],false);
+if(S.finished)setTimeout(showWin,700);
+else if(S.played.some(Boolean))setTimeout(()=>toast(`Продолжаем игру! Ходит ${S.names[S.turn]} ${AVATARS[S.av[S.turn]]}`),600);
+</script>
+</body>
+</html>
