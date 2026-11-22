@@ -32,8 +32,8 @@ dependencies {
 }
 
 // Kotlin 1.8+ включил kotlin-stdlib-jdk7 и kotlin-stdlib-jdk8 в kotlin-stdlib.
-// Разные версии этих модулей дают "Duplicate class" на checkDebugDuplicateClasses.
-// Приводим все три к одной версии: jdk7/jdk8 становятся пустыми заглушками.
+// Разные версии этих модулей дают Duplicate class на checkDebugDuplicateClasses.
+// Приводим все три модуля к одной версии - jdk7/jdk8 становятся пустыми заглушками.
 configurations.configureEach {
     resolutionStrategy.force(
             'org.jetbrains.kotlin:kotlin-stdlib:1.8.22',
